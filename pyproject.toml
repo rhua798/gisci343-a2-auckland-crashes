@@ -1,0 +1,9 @@
+[project]
+name = "gisci343-a2-auckland-crashes"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "shinyswatch>=0.10.0",
+]
