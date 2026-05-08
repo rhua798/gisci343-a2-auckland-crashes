@@ -1,7 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 import matplotlib.pyplot as plt
-from ipyleaflet import Map, CircleMarker,basemaps,LegendControl, MarkerCluster
+from ipyleaflet import Map, CircleMarker,basemaps,LegendControl
 from shinywidgets import output_widget, register_widget
 from pyproj import Transformer
 from pathlib import Path
@@ -205,7 +205,7 @@ def server(input, output, session):
 
         # clear old layers
         while len(m.layers) > 1:
-            m.remove_layer(m.layers[-1])
+            m.remove(m.layers[-1])
 
         # remove missing coordinates
         df = df.dropna(subset=["lat", "lon"])
@@ -233,9 +233,8 @@ def server(input, output, session):
 
             markers.append(marker)
 
-        cluster = MarkerCluster(markers=markers)
-
-        m.add_layer(cluster)
+        for marker in markers:
+            m.add(marker)     
 
         # add legend once
         if not any(isinstance(c, LegendControl) for c in m.controls):
@@ -251,6 +250,6 @@ def server(input, output, session):
                 position="topright"
             )
 
-            m.add_control(legend)
+            m.add(legend)
 
 app = App(app_ui, server)
