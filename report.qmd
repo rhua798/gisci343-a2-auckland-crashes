@@ -1,0 +1,22 @@
+---
+title: "GISCI 343 Assignment 2: Design Report"
+author: "Ruoxuan Huang (rhua798)"
+date: 2026.5.8
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    number-sections: true
+    toc: false
+---
+
+Motivation and audience
+
+Data and preparation
+
+Technical architecture
+
+User interface walkthrough
+
+Limitations and future improvements
