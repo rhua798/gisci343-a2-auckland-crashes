@@ -1,7 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 import matplotlib.pyplot as plt
-from ipyleaflet import Map, CircleMarker,basemaps,LegendControl
+from ipyleaflet import Map, CircleMarker,basemaps,LegendControl, MarkerCluster
 from shinywidgets import output_widget, register_widget
 from pyproj import Transformer
 from pathlib import Path
@@ -81,12 +81,12 @@ app_ui = ui.page_fluid(
         ui.div(
             # MAP
             ui.div(
-                output_widget("map",height="500px"),
+                output_widget("map"),
                 class_="card map-card"
             ),
             # CHART
             ui.div(
-                ui.output_plot("trend",height="500px"),
+                ui.output_plot("trend"),
                 class_="card chart-card"
             ),
         ),
@@ -126,7 +126,7 @@ def server(input, output, session):
         elif severity == "Minor Crash":
             return "#91bfdb"   
         else:
-            return "#cccccc" 
+            return "#4575b4" 
     
     @render.plot
     def trend():
@@ -198,52 +198,52 @@ def server(input, output, session):
     )
     register_widget("map", m)
 
-
     @reactive.effect
     def update_map():
-
         df = filtered()
 
-        # Keep only base layer
+       # Reset map layers (keep only the base layer)
         base_layer = m.layers[0]
         m.layers = (base_layer,)
 
-        # Remove missing coordinates
+        # Remove rows with missing coordinates
         df = df.dropna(subset=["lat", "lon"])
-
-        # Stop if no data
+        
+        # If no data after filtering, stop updating
         if len(df) == 0:
             return
 
-        # Limit points for browser performance
+        # Limit number of points to avoid performance issues
         if len(df) > 1000:
-            df = df.sample(1000, random_state=1)
+            df = df.sample(1000)
 
-        # Add crash points directly to map
+        # Create markers for each crash point
+        markers = []
         for row in df.itertuples():
-
-            marker = CircleMarker(
-                location=(row.lat, row.lon),
-                radius=5,
-                color=get_color(row.crashSeverity),
-                fill_color=get_color(row.crashSeverity),
-                fill_opacity=0.7,
-                stroke=False
+            markers.append(
+                CircleMarker(
+                    location=(row.lat, row.lon),
+                    radius=5,
+                    color=get_color(row.crashSeverity),
+                    fill_color=get_color(row.crashSeverity),
+                    fill_opacity=0.7
+                )
             )
 
-            m.add(marker)
+        # Add markers to the map if any exist
+        if len(markers) > 0:
+            m.add_layer(MarkerCluster(markers=markers))
 
-        # Add legend only once
+        # Add legend only once (avoid duplicates)
         if not any(isinstance(c, LegendControl) for c in m.controls):
             legend = LegendControl(
                 {
                     "Fatal": "#d73027",
                     "Serious": "#fc8d59",
                     "Minor": "#91bfdb",
-                    "Non-injury": "#cccccc"
+                    "Non-injury": "#4575b4"
                 },
-                name="Crash Severity",
-                position="topright"
+                name="Crash Severity"
             )
             m.add_control(legend)
 
