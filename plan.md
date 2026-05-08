@@ -1,28 +1,28 @@
-## 1. Motivation and Audience
+## 1. Motivation and Audience    
 
 ### 1.1 What problem does your dashboard address?
 
 <!-- State the specific question your dashboard helps someone answer. -->
 <!-- Example: "How has public transport patronage in Auckland recovered since 2020?" -->
 
-This dashboard investigates where severe road crashes occur in Auckland and how crash patterns vary across different speed limits between 2024 and 2026.
+This dashboard investigates how crash severity patterns vary across Auckland between 2023 and 2026, with a particular focus on pedestrian-related crashes under different light conditions.
 
-The aim is to explore the spatial distribution of crashes and examine whether higher speed limits are associated with more severe crash outcomes. By combining location, time, and road characteristics, the dashboard helps identify patterns in road safety risks.
+The dashboard combines spatial crash locations with severity and lighting information to explore where serious and fatal crashes are concentrated and whether pedestrian crashes are more severe during darker conditions. By integrating interactive maps and charts, the dashboard helps users identify potential road safety risks and understand how environmental conditions may influence crash outcomes.
 
 ### 1.2 Who is it for?
 
 <!-- Describe one or two realistic users — their role and the decision this dashboard informs. -->
 
-This dashboard is designed for transport planners, road safety analysts in Auckland.
+This dashboard is designed for transport planners, road safety analysts, and local government decision-makers in Auckland.
 
-These users can use the dashboard to identify high-risk areas and better understand how speed limits relate to crash severity. The insights can support decisions about speed management, road design, and safety interventions.
+These users can use the dashboard to identify high-risk locations, examine pedestrian crash patterns, and better understand how lighting conditions relate to crash severity. The insights may support decisions about pedestrian safety improvements, street lighting, traffic calming measures, and future road safety planning.
 
 ### 1.3 What insight does it enable?
 
 <!-- One sentence: the single most important thing a user should take away. -->
 <!-- This sentence might become the title or subtitle of your app. -->
 
-Severe crashes are more likely to occur on roads with higher speed limits and are concentrated in specific areas of Auckland.
+Pedestrian crashes in Auckland are concentrated in specific locations, and crashes occurring under darker light conditions are more likely to result in serious or fatal outcomes.
 
 
 ## 2. Data and Preparation
@@ -31,37 +31,31 @@ Severe crashes are more likely to occur on roads with higher speed limits and ar
 Dataset: CAS_Data_public
 Source URL: https://opendata-nzta.opendata.arcgis.com/search
 Format: CSV
-Rows(approx.): ~60000. (60812)
-Key variables: X, Y, crashYear, crashSeverity,speedLimit
+Rows(approx.): ~28000. (28584)
+Key variables: X, Y, crashYear, crashSeverity,pedestrian,light
 
 ### 2.2 Cleaning and preparation steps
 
 <!-- List the steps needed to get each dataset ready. One line each. -->
-1. Selected relevant variables (X, Y, crashYear, crashSeverity, speedLimit) and removed unnecessary columns.
-2. Filtered the dataset to include only crashes between 2024 and 2026.
-3. Removed rows with missing values using dropna().
-4. Checked coordinate fields (X, Y) and ensured they are suitable for mapping.
-5. Converted data types where necessary (e.g. crashYear as integer).
-6. Prepared filtered datasets for use in reactive functions in the Shiny app.
+1. Selected the variables needed for the dashboard, including X, Y, crash year, crash severity, pedestrian involvement, and light conditions.
+2. Filtered the dataset to include crashes occurring between 2023 and 2026.
+3. Filled missing light condition values with "Unknown".
+4. Filled missing pedestrian values with 0 and converted the variable to integer format.
+5. Converted crash coordinates from NZTM (EPSG:2193) to WGS84 (EPSG:4326) for use in the interactive map.
+6. Created latitude and longitude fields (lat, lon) for mapping in ipyleaflet.
+7. Prepared reactive filtered datasets for use in the Shiny dashboard outputs.
 
 ### 2.3 Limitations
 
 <!-- Every dataset has gaps. Note at least two. -->
 
-- The dataset only includes crashes recorded in the CAS system, so minor or unreported incidents may be missing.
-- The data is limited to the years 2024–2026, which may not capture longer-term trends.
-- Speed limit data reflects posted limits, not actual driving speeds, which may affect interpretation.
-- Spatial accuracy depends on recorded coordinates, which may contain small positional errors.
+- The dashboard only focuses on selected variables related to pedestrian crashes and does not include other possible factors such as weather, traffic volume, driver behaviour, or road conditions.
+- The dataset only includes crashes recorded between 2023 and 2026, so longer-term crash trends cannot be analysed.
 
 
+## Section 3: Technical Planning. 
+When users open the dashboard, they first see the title “Auckland Crash Severity Dashboard (2023–2026)” together with a short description explaining that the dashboard explores crash severity patterns in Auckland, with a focus on pedestrian-related crashes. The layout is organised into two main sections: a filter panel on the left and the visual outputs on the right. A help card below the filters explains how to use the dashboard and how the visualisations should be interpreted.
 
-## Section 3: Technical Planning. --- 修改所有 ！！！
-When the user opens the dashboard, they see a clean layout with a title at the top and a set of filters on the left. The title reads “Auckland Crash Severity Dashboard (2024–2026)”, followed by a short description explaining that the dashboard explores crash patterns by year, crash severity, and speed limit.
+The left sidebar contains three user inputs. A dropdown menu allows the user to select a crash year between 2023 and 2026. Another dropdown menu allows the user to filter crash severity levels, including Non-Injury, Minor, Serious, and Fatal crashes. A radio button input allows the user to choose between viewing pedestrian crashes only or all crashes. Below the filters, a text summary dynamically reports how many crashes match the current filters and identifies the most common crash severity.
 
-In the control panel, the user can interact with three inputs. A slider allows the user to select a specific year between 2024 and 2026. A dropdown menu lets the user choose a crash severity level (All, Non-Injury Crash, Minor Crash, Serious Crash, or Fatal Crash). A second slider allows the user to filter crashes by speed limit range. These inputs can be adjusted independently, and all visual outputs update automatically in response.
-
-Below the filters, the dashboard displays a text summary showing how many crashes match the current selection and a brief description of the most common crash type. On the right, a bar chart shows the number of crashes by speed limit, helping users compare how crash frequency varies across different speed zones. An interactive map (ipyleaflet) displays the spatial distribution of crashes as clustered points, allowing users to see where crashes are concentrated geographically.
-
-When the user changes any input (year, severity, or speed limit), all outputs update reactively. The filtering logic is handled by a shared reactive calculation (@reactive.calc), which ensures that both the chart and the map use the same filtered dataset. This avoids redundant computation and keeps the application efficient. Additional reactive behaviour could be implemented using @reactive.effect if needed, for example to reset inputs or update UI elements dynamically.
-
-Overall, the dashboard allows users to explore how crash severity and speed limits interact across time and space, providing a clear and interactive view of road safety patterns in Auckland.
+On the right side of the dashboard, users see two visual outputs. The first output is an interactive ipyleaflet map that displays crash locations across Auckland as coloured point markers. Different colours represent different crash severity levels. Users can zoom and pan around the map to explore where crashes are concentrated. The second output is a quantitative bar chart showing how pedestrian crash severity varies under different light conditions, such as bright sun, overcast, dark, and twilight conditions. When users change the filters, both the map and chart update automatically to reflect the selected crash data.

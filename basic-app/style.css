@@ -1,0 +1,205 @@
+/* =====================================================
+   Auckland Crash Dashboard - Custom CSS
+===================================================== */
+
+/* ---------- Page Background ---------- */
+
+body {
+    background-color: #f4f7fb;
+    font-family: "Inter", sans-serif;
+    color: #1e293b;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Main Page Container ---------- */
+
+.main-page {
+    max-width: 1500px;
+    margin: auto;
+    padding: 25px;
+}
+
+/* ---------- Dashboard Title ---------- */
+
+h1, h2 {
+    color: #0f172a;
+    font-weight: 900;
+
+}
+
+h2 {
+    margin-top: 20px;
+    margin-bottom: 10 px; 
+}
+
+p {
+    color: #475569;
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+/* ---------- Summary Box ---------- */
+
+.summary-box {
+    margin-top: 35px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff,
+        #dbeafe
+    );
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.summary-title {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #1e40af;
+    margin-bottom: 10px;
+}
+
+.summary-text {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.6;
+    color: #1e3a8a;
+}
+/* ---------- Help / Description Card ---------- */
+
+.help-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    height:500px;
+}
+
+.help-card h4 {
+    margin-top: 0;
+    color: #174098;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+
+/* ---------- Filter Panel ---------- */
+
+.filter-panel {
+    background: white;
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    height: fit-content;
+}
+
+.filter-panel h3 {
+    color: #2563eb;
+    font-size: 32px;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+/* ---------- Inputs ---------- */
+
+.form-select,
+.form-control {
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 10px !important;
+    font-size: 15px;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2) !important;
+}
+
+/* ---------- Radio Buttons ---------- */
+
+.shiny-input-radiogroup label {
+    font-size: 16px;
+    color: #1e293b;
+}
+
+/* ---------- Summary Text ---------- */
+
+.summary-text {
+    margin-top: 25px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e3a8a;
+    line-height: 1.5;
+}
+
+/* ---------- Generic Card ---------- */
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+    height: 500px;
+}
+
+
+/* ---------- Map Styling ---------- */
+
+.leaflet-container {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* ---------- Plot Styling ---------- */
+
+canvas,
+svg {
+    border-radius: 12px;
+}
+
+/* ---------- Section Titles ---------- */
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #0f172a;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ---------- Responsive Layout ---------- */
+
+@media (max-width: 1000px) {
+
+    .main-page {
+        padding: 15px;
+    }
+
+    .filter-panel {
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+}
