@@ -52,7 +52,7 @@ app_ui = ui.page_fluid(
                 ui.input_radio_buttons("user", "Road User",["Pedestrian", "All"]),
                 ui.div(
                     ui.div(
-                        "Selection Summary",
+                        "Summary",
                         class_="summary-title"
                     ),
                     ui.output_text("summary"),
