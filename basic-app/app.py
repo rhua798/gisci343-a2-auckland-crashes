@@ -200,42 +200,46 @@ def server(input, output, session):
 
     @reactive.effect
     def update_map():
+
         df = filtered()
 
-       # Reset map layers (keep only the base layer)
-        base_layer = m.layers[0]
-        m.layers = (base_layer,)
+        # clear old layers
+        while len(m.layers) > 1:
+            m.remove_layer(m.layers[-1])
 
-        # Remove rows with missing coordinates
+        # remove missing coordinates
         df = df.dropna(subset=["lat", "lon"])
-        
-        # If no data after filtering, stop updating
+
+        # no data
         if len(df) == 0:
             return
 
-        # Limit number of points to avoid performance issues
+        # sample large datasets
         if len(df) > 1000:
-            df = df.sample(1000)
+            df = df.sample(1000, random_state=1)
 
-        # Create markers for each crash point
         markers = []
+
         for row in df.itertuples():
-            markers.append(
-                CircleMarker(
-                    location=(row.lat, row.lon),
-                    radius=5,
-                    color=get_color(row.crashSeverity),
-                    fill_color=get_color(row.crashSeverity),
-                    fill_opacity=0.7
-                )
+
+            marker = CircleMarker(
+                location=(row.lat, row.lon),
+                radius=5,
+                color=get_color(row.crashSeverity),
+                fill_color=get_color(row.crashSeverity),
+                fill_opacity=0.7,
+                stroke=False
             )
 
-        # Add markers to the map if any exist
-        if len(markers) > 0:
-            m.add_layer(MarkerCluster(markers=markers))
+            markers.append(marker)
 
-        # Add legend only once (avoid duplicates)
+        cluster = MarkerCluster(markers=markers)
+
+        m.add_layer(cluster)
+
+        # add legend once
         if not any(isinstance(c, LegendControl) for c in m.controls):
+
             legend = LegendControl(
                 {
                     "Fatal": "#d73027",
@@ -243,8 +247,10 @@ def server(input, output, session):
                     "Minor": "#91bfdb",
                     "Non-injury": "#4575b4"
                 },
-                name="Crash Severity"
+                name="Crash Severity",
+                position="topright"
             )
+
             m.add_control(legend)
 
 app = App(app_ui, server)
