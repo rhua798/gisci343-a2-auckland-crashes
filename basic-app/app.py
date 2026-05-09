@@ -5,13 +5,17 @@ import json
 from pathlib import Path
 from pyproj import Transformer
 
+
 APP_DIR = Path(__file__).parent
 crashes = pd.read_csv(APP_DIR / "CAS_Data_public.csv")
 
+# filter the data we needed
 crashes = crashes[["X", "Y", "crashYear", "crashSeverity", "pedestrian", "light"]]
 
+# year filter--choose 2023 to 2026
 crashes = crashes[(crashes["crashYear"] >= 2023) & (crashes["crashYear"] <= 2026)]
 crashes["light"] = crashes["light"].fillna("Unknown")
+# change the data type
 crashes["pedestrian"] = crashes["pedestrian"].fillna(0).astype(int)
 
 #（NZTM → WGS84）
@@ -20,6 +24,7 @@ crashes["lon"], crashes["lat"] = transformer.transform(
     crashes["X"].values, crashes["Y"].values
 )
 
+# define severity colours
 SEVERITY_COLORS = {
     "Fatal Crash": "#d73027",
     "Serious Crash": "#fc8d59",
@@ -27,6 +32,7 @@ SEVERITY_COLORS = {
     "Non-Injury Crash": "#4575b4",
 }
 
+#ui
 app_ui = ui.page_fluid(
     ui.include_css(APP_DIR / "style.css"),
     ui.head_content(
@@ -35,6 +41,7 @@ app_ui = ui.page_fluid(
         ui.tags.link(rel="stylesheet", href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"),
         ui.tags.script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"),
     ),
+    #title
     ui.div(
         ui.h2("Auckland Crash Severity Dashboard (2023 - 2026)"),
         ui.p(
@@ -43,6 +50,7 @@ app_ui = ui.page_fluid(
         ),
     ),
     ui.layout_columns(
+        # left sidebar
         ui.div(
             ui.div(
                 ui.h4("Filters"),
@@ -68,6 +76,7 @@ app_ui = ui.page_fluid(
                 ui.p("Selecting different filters will automatically update the visualisations."),
             ),
         ),
+        # right side
         ui.div(
             ui.div(
                 ui.output_ui("map"),
@@ -79,7 +88,7 @@ app_ui = ui.page_fluid(
             ),
         ),
         col_widths=(3, 9),
-    ),
+    )
 )
 
 
