@@ -1,7 +1,7 @@
 ---
 title: "GISCI 343 Assignment 2: Design Report"
 author: "Ruoxuan Huang (rhua798)"
-date: 2026.5.8
+date: 2026.5.10
 format:
   pdf:
     documentclass: article
@@ -11,12 +11,86 @@ format:
     toc: false
 ---
 
-Motivation and audience
+## Motivation and audience
 
-Data and preparation
+Road safety is an important issue in urban environments, particularly in growing cities where large numbers of vehicles, pedestrians, and cyclists share the road network every day. This dashboard explores road crash patterns in Auckland from 2023 to 2026, with a focus on pedestrian crashes and crash severity under different lighting conditions. It helps users better understand where crashes occur, how severe they are, and how factors such as lighting conditions may influence crash outcomes.
 
-Technical architecture
+The dashboard is designed for a general audience interested in transport safety, including city planners, researchers, students, and members of the public. It provides an accessible and interactive way to explore crash data without requiring advanced GIS or technical knowledge.
 
-User interface walkthrough
+By allowing users to filter crashes by year, severity, and road user type, the dashboard enables users to identify spatial patterns and compare trends across different conditions. The interactive map highlights where crashes occurred across Auckland. And the chart helps users compare pedestrian crash severity under different lighting environments. These insights may support discussions around pedestrian safety, urban planning, and road safety awareness in Auckland.
 
-Limitations and future improvements
+## Data and preparation
+
+This dashboard uses publicly available crash data from the New Zealand Crash Analysis System (CAS). The original dataset contains road crash records from across New Zealand, including information about crash location, crash severity, road users involved, and environmental conditions. For this project, only crash records from Auckland between 2023 and 2026 were selected for analysis.
+
+To prepare the dataset for the dashboard, only the variables needed for the analysis were retained, including crash coordinates (X, Y), crash year, crash severity, pedestrian involvement, and light conditions. Missing light condition values were replaced with "Unknown", while missing pedestrian values were filled with 0 and converted to integer format.
+
+The original crash coordinates were stored in NZTM (EPSG:2193). Since ipyleaflet requires coordinates in WGS84 (EPSG:4326), the coordinates were transformed using pyproj.Transformer. New longitude and latitude fields were then created for use in the interactive map.
+
+A colour scheme was also defined for different crash severity categories to improve readability in the map visualisation. Fatal and serious crashes were displayed using warmer colours, while less severe crashes used cooler colours.
+
+One limitation of the dataset is that some records contain missing or unknown information, particularly for light conditions. In addition, the dashboard only focuses on a small number of variables and does not include other possible factors such as weather, traffic volume, or driver behaviour that may also influence crash severity.
+
+## Technical architecture
+
+The dashboard was developed using Shiny for Python and follows a reactive application structure. The application is organised into three main parts: data preparation, user interface design, and server-side reactive logic. The crash dataset is first cleaned and prepared before the dashboard loads, while the user interface defines the layout of the filter panel, summary section, interactive map, and chart outputs.
+
+The dashboard contains three user inputs: a year dropdown menu, a crash severity dropdown menu, and a road user radio button selector. These inputs are connected to a shared @reactive.calc function called filtered(), which filters the crash dataset according to the current user selections. Using a shared reactive calculation improves efficiency because the filtering process only runs once for each input change.
+
+The dashboard includes three main outputs: a dynamic text summary, an interactive map, and a bar chart visualisation. The summary reports the number of crashes matching the selected filters and identifies the most common crash severity category. The interactive map displays crash locations as coloured point markers, while the bar chart compares pedestrian crash severity under different lighting conditions. All outputs update automatically when users change the filters.
+
+Several Shiny rendering functions are used throughout the dashboard, including @render.text, @render.ui, and @render.plot. During development, the original implementation used ipyleaflet together with @render_widget, following the original assignment requirements. However, compatibility issues between ipyleaflet, shinylive, and Pyodide caused map markers to render inconsistently after deployment to GitHub Pages. To improve browser compatibility and ensure stable deployment, the final implementation uses Leaflet.js rendered through a Shiny UI output while maintaining the same interactive mapping functionality. This alternative implementation was approved by Hyesop Shin due to the known compatibility limitations of ipyleaflet in the shinylive environment.
+
+To improve performance, only the variables required for analysis were retained in the dataset. In addition, when the filtered dataset becomes very large, the number of crash points displayed on the map is limited using random sampling to maintain responsive interaction and improve browser performance.
+
+The reactive structure of the dashboard can be summarised as follows:
+```text
+User Inputs
+(year, severity, road user)
+          ↓
+     filtered()
+   @reactive.calc
+          ↓
+ ┌────────┼────────┐
+ ↓        ↓        ↓
+Summary   Map     Chart
+```
+
+## User interface walkthrough
+### Dashboard Overview
+When users first open the dashboard, they see the main title, filter panel, summary section, interactive map, and bar chart visualisation. The layout is designed to keep the controls on the left side and the visual outputs on the right side for easy navigation.
+
+![Dashboard Overview](image/overview1.png)
+![Dashboard Overview](image/overview2.png)
+
+### Filtering Crash Data
+Users can filter the crash dataset by year, crash severity, and road user type using the controls in the left sidebar. Once a filter is changed, the summary, map, and chart automatically update to reflect the selected crash data. 
+For example, when users select:
+
+-  Year = 2025
+-  Severity = Serious Crash
+-  Road User = All
+
+The dashboard displays only serious crashes recorded in 2025. The map highlights where these crashes are concentrated across Auckland. The chart shows how serious pedestrian crashes vary under different lighting conditions. 
+
+![Filtering Crash Data](image/Filtering1.png)
+![Filtering Crash Data](image/Filtering2.png)
+
+### Comparing Crash Severity Under Different Lighting Conditions
+The bar chart helps users compare pedestrian crash severity under different lighting conditions, including bright sun, overcast, dark, and twilight conditions.
+For example, when users select:
+
+- Year = 2025
+- Severity = All
+- Road User = Pedestrian
+
+The chart shows that minor crashes make up the largest proportion of pedestrian crashes across all lighting conditions. Serious Crashes are also relatively common, particularly during dark conditions. In contrast, Fatal Crashes represent only a very small proportion of the total crashes.
+![Crash Severity by Light Condition](image/light_plot.png)
+
+## Limitations and future improvements
+
+Although the dashboard provides an interactive overview of crash patterns in Auckland, several limitations remain. The analysis only focuses on a small number of variables from the original crash dataset, including crash severity, pedestrian involvement, and lighting conditions. Other factors such as weather conditions, traffic volume, road type, and speed limits were not included and may also influence crash outcomes.
+
+The dashboard only includes crashes recorded between 2023 and 2026, which limits longer-term trend analysis. In addition, some records contain missing or simplified information that may affect the accuracy of the visualisations. During deployment, compatibility limitations between ipyleaflet, shinylive, and Pyodide also required the interactive map implementation to be adjusted for browser stability.
+
+Several improvements could be made in future versions of the dashboard. Additional variables such as weather, road surface conditions, or speed limits could support deeper analysis. More interactive features, including pop-up crash details, hotspot analysis, or improved mobile responsiveness, could also enhance the user experience.
